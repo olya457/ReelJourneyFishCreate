@@ -1,17 +1,16 @@
 workflows:
   ios-release:
-    name: ReelJourneyFishCreate iOS
+    name: Wavora Journey iOS
     max_build_duration: 120
     instance_type: mac_mini_m2
     integrations:
-      app_store_connect: ReelJourneyFishCreate
+      app_store_connect: Reel Journey Fish Create
     environment:
       ios_signing:
         distribution_type: app_store
-        # Set the final bundle identifier before enabling distribution.
-        bundle_identifier: YOUR_BUNDLE_IDENTIFIER
+        bundle_identifier: com.cetykolaserb.besikolascern
       vars:
-        APP_STORE_APPLE_ID: YOUR_APP_STORE_APPLE_ID
+        APP_STORE_APPLE_ID: 6793943102
         XCODE_WORKSPACE: ReelJourneyFishCreate.xcworkspace
         XCODE_SCHEME: ReelJourneyFishCreate
       node: 20
@@ -55,4 +54,5 @@ workflows:
     publishing:
       app_store_connect:
         auth: integration
-        submit_to_app_store: false
+        submit_to_app_store: true
+        copyright: Diana Stewart
