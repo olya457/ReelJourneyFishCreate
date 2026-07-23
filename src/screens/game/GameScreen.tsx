@@ -1,7 +1,71 @@
 import React from 'react';
-import {StyleSheet,Text,View} from 'react-native';
-import {Button,Card,FadeIn,Header,Screen} from '../../components/UI';
+import {StyleSheet, Text, View} from 'react-native';
+import {Button, Card, FadeIn, Header, Screen} from '../../components/UI';
 import {colors} from '../../constants/theme';
 import {useApp} from '../../store/AppContext';
-export function GameScreen(){const {navigate} = useApp(); const rules = [['1','Add your players','Enter or edit every player name'],['2','Get a question','The current player sees a question immediately'],['3','Truth or Lie','Answer aloud and choose one option'],['4','Pass the turn','The next player starts automatically']]; return <Screen><View style={styles.hero}><Text style={styles.fire}>🔥</Text><Header title="Truth or Lie"/><Text style={styles.intro}>A quick pass-and-play honesty game for friends around the campfire.</Text></View>{rules.map((rule,index)=><FadeIn key={rule[0]} delay={index * 60}><Card style={styles.rule}><Text style={styles.number}>{rule[0]}</Text><View style={styles.ruleCopy}><Text style={styles.ruleTitle}>{rule[1]}</Text><Text style={styles.ruleText}>{rule[2]}</Text></View></Card></FadeIn>)}<View style={styles.start}><Button title="Play With Friends" onPress={()=>navigate('GameSetup')}/></View></Screen>;}
-const styles = StyleSheet.create({hero:{marginHorizontal:-18,marginTop:-54,padding:22,paddingTop:64,backgroundColor:'#0D342C',borderBottomLeftRadius:28,borderBottomRightRadius:28,marginBottom:18},fire:{fontSize:40},intro:{color:'#B3C9C1',lineHeight:20},rule:{flexDirection:'row',alignItems:'center',gap:12,marginBottom:10},ruleCopy:{flex:1},number:{width:34,height:34,borderRadius:10,textAlign:'center',paddingTop:7,backgroundColor:colors.orange,color:'#071724',fontWeight:'900'},ruleTitle:{color:colors.text,fontWeight:'800'},ruleText:{color:colors.muted,fontSize:12,marginTop:3},start:{marginTop:18}});
+export function GameScreen() {
+  const {navigate} = useApp();
+  const rules = [
+    ['1', 'Add your players', 'Enter or edit every player name'],
+    ['2', 'Get a question', 'The current player sees a question immediately'],
+    ['3', 'Truth or Lie', 'Answer aloud and choose one option'],
+    ['4', 'Pass the turn', 'The next player starts automatically'],
+  ];
+  return (
+    <Screen>
+      <View style={styles.hero}>
+        <Text style={styles.fire}>🔥</Text>
+        <Header title="Truth or Lie" />
+        <Text style={styles.intro}>
+          A quick pass-and-play honesty game for friends around the campfire.
+        </Text>
+      </View>
+      {rules.map((rule, index) => (
+        <FadeIn key={rule[0]} delay={index * 60}>
+          <Card style={styles.rule}>
+            <Text style={styles.number}>{rule[0]}</Text>
+            <View style={styles.ruleCopy}>
+              <Text style={styles.ruleTitle}>{rule[1]}</Text>
+              <Text style={styles.ruleText}>{rule[2]}</Text>
+            </View>
+          </Card>
+        </FadeIn>
+      ))}
+      <View style={styles.start}>
+        <Button
+          title="Play With Friends"
+          onPress={() => navigate('GameSetup')}
+        />
+      </View>
+    </Screen>
+  );
+}
+const styles = StyleSheet.create({
+  hero: {
+    marginHorizontal: -18,
+    marginTop: -54,
+    padding: 22,
+    paddingTop: 64,
+    backgroundColor: '#0D342C',
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+    marginBottom: 18,
+  },
+  fire: {fontSize: 40},
+  intro: {color: '#B3C9C1', lineHeight: 20},
+  rule: {flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 10},
+  ruleCopy: {flex: 1},
+  number: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    textAlign: 'center',
+    paddingTop: 7,
+    backgroundColor: colors.orange,
+    color: '#071724',
+    fontWeight: '900',
+  },
+  ruleTitle: {color: colors.text, fontWeight: '800'},
+  ruleText: {color: colors.muted, fontSize: 12, marginTop: 3},
+  start: {marginTop: 18},
+});

@@ -1,10 +1,70 @@
 import {Spot} from '../types';
 
 export const spots: Spot[] = [
-  {id:'emerald', name:'Emerald Bay', region:'Lake Tahoe, CA', country:'USA', coordinates:[38.9545,-120.1003], about:'A sheltered mountain bay surrounded by pine-covered slopes, granite shoreline, and exceptionally clear blue water.', conditions:'Cold, clear, deep water. Winds may become stronger during the afternoon.', bestTime:'May–October, early morning', facilities:['Seasonal restrooms','Kayak access','Hiking trails','Shoreline access'], species:['Lake Trout','Rainbow Trout','Brown Trout','Kokanee Salmon'], rules:'Check current California fishing license requirements and Lake Tahoe catch regulations before visiting.', saved:true},
-  {id:'minnewanka', name:'Lake Minnewanka', region:'Banff, Alberta', country:'Canada', coordinates:[51.248,-115.498], about:'A long mountain reservoir framed by steep forested slopes and the Canadian Rockies.', conditions:'Cold, deep water with rapidly changing mountain weather.', bestTime:'May–September, morning', facilities:['Parking','Marina','Boat launch','Restrooms'], species:['Lake Trout','Mountain Whitefish','Cutthroat Trout'], rules:'A Canadian national park fishing permit is required.'},
-  {id:'jenny', name:'Jenny Lake', region:'Grand Teton, WY', country:'USA', coordinates:[43.7547,-110.7309], about:'A clear glacial lake located directly beneath the dramatic peaks of the Teton Range.', conditions:'Cold, clear mountain water with deep sections close to shore.', bestTime:'June–September, early morning', facilities:['Parking','Boat launch','Campground','Hiking trails'], species:['Lake Trout','Cutthroat Trout','Mountain Whitefish'], rules:'A valid Wyoming fishing license is required.'},
-  {id:'bled', name:'Lake Bled', region:'Upper Carniola', country:'Slovenia', coordinates:[46.363,14.0938], about:'An Alpine lake surrounded by wooded hills, mountain views, and the famous island church.', conditions:'Generally calm water with deeper central sections.', bestTime:'April–October, early morning', facilities:['Parking','Boat access','Shoreline paths'], species:['Pike','Carp','Lake Trout','Perch'], rules:'A valid fishing permit is required.'},
+  {
+    id: 'emerald',
+    name: 'Emerald Bay',
+    region: 'Lake Tahoe, CA',
+    country: 'USA',
+    coordinates: [38.9545, -120.1003],
+    about:
+      'A sheltered mountain bay surrounded by pine-covered slopes, granite shoreline, and exceptionally clear blue water.',
+    conditions:
+      'Cold, clear, deep water. Winds may become stronger during the afternoon.',
+    bestTime: 'May–October, early morning',
+    facilities: [
+      'Seasonal restrooms',
+      'Kayak access',
+      'Hiking trails',
+      'Shoreline access',
+    ],
+    species: ['Lake Trout', 'Rainbow Trout', 'Brown Trout', 'Kokanee Salmon'],
+    rules:
+      'Check current California fishing license requirements and Lake Tahoe catch regulations before visiting.',
+    saved: true,
+  },
+  {
+    id: 'minnewanka',
+    name: 'Lake Minnewanka',
+    region: 'Banff, Alberta',
+    country: 'Canada',
+    coordinates: [51.248, -115.498],
+    about:
+      'A long mountain reservoir framed by steep forested slopes and the Canadian Rockies.',
+    conditions: 'Cold, deep water with rapidly changing mountain weather.',
+    bestTime: 'May–September, morning',
+    facilities: ['Parking', 'Marina', 'Boat launch', 'Restrooms'],
+    species: ['Lake Trout', 'Mountain Whitefish', 'Cutthroat Trout'],
+    rules: 'A Canadian national park fishing permit is required.',
+  },
+  {
+    id: 'jenny',
+    name: 'Jenny Lake',
+    region: 'Grand Teton, WY',
+    country: 'USA',
+    coordinates: [43.7547, -110.7309],
+    about:
+      'A clear glacial lake located directly beneath the dramatic peaks of the Teton Range.',
+    conditions: 'Cold, clear mountain water with deep sections close to shore.',
+    bestTime: 'June–September, early morning',
+    facilities: ['Parking', 'Boat launch', 'Campground', 'Hiking trails'],
+    species: ['Lake Trout', 'Cutthroat Trout', 'Mountain Whitefish'],
+    rules: 'A valid Wyoming fishing license is required.',
+  },
+  {
+    id: 'bled',
+    name: 'Lake Bled',
+    region: 'Upper Carniola',
+    country: 'Slovenia',
+    coordinates: [46.363, 14.0938],
+    about:
+      'An Alpine lake surrounded by wooded hills, mountain views, and the famous island church.',
+    conditions: 'Generally calm water with deeper central sections.',
+    bestTime: 'April–October, early morning',
+    facilities: ['Parking', 'Boat access', 'Shoreline paths'],
+    species: ['Pike', 'Carp', 'Lake Trout', 'Perch'],
+    rules: 'A valid fishing permit is required.',
+  },
 ];
 
 export const fishingTips = [
@@ -15,7 +75,13 @@ export const fishingTips = [
   'Keep your hooks sharp. A dull hook can turn a strong bite into a missed catch.',
 ];
 
-export const drawPrompts = ['Draw your dream fishing spot at sunrise.','Draw the biggest fish you can imagine.','Create a funny fish wearing a hat.','Design your own colorful fishing lure.','Draw an underwater city built by fish.'];
+export const drawPrompts = [
+  'Draw your dream fishing spot at sunrise.',
+  'Draw the biggest fish you can imagine.',
+  'Create a funny fish wearing a hat.',
+  'Design your own colorful fishing lure.',
+  'Draw an underwater city built by fish.',
+];
 export const honestQuestions = [
   'What is something you have never told anyone in this group?',
   'What was your first impression of the person sitting to your left?',
@@ -48,4 +114,10 @@ export const honestQuestions = [
   'What is something you believed for far too long?',
   'Which person in this group knows you best?',
 ];
-export const tasks = ['Perform your best impression of a fish being reeled in.','Tell a true story that sounds completely made up.','Create a short victory dance and perform it.','Pretend to present a weather forecast for today’s fishing trip.','Give every player one sincere compliment.'];
+export const tasks = [
+  'Perform your best impression of a fish being reeled in.',
+  'Tell a true story that sounds completely made up.',
+  'Create a short victory dance and perform it.',
+  'Pretend to present a weather forecast for today’s fishing trip.',
+  'Give every player one sincere compliment.',
+];

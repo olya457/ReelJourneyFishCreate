@@ -1,8 +1,158 @@
-import React,{useMemo,useState} from 'react';
-import {Image,Pressable,StyleSheet,Text,View} from 'react-native';
-import {fallbackSpotImage,spotImages} from '../../assets/images';
-import {Button,Card,Chip,FadeIn,Field,Header,Screen} from '../../components/UI';
+import React, {useMemo, useState} from 'react';
+import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
+import {fallbackSpotImage, spotImages} from '../../assets/images';
+import {appAssets} from '../../assets/images';
+import {
+  Button,
+  Card,
+  Chip,
+  FadeIn,
+  Field,
+  Header,
+  Screen,
+} from '../../components/UI';
 import {colors} from '../../constants/theme';
 import {useApp} from '../../store/AppContext';
-export function LocationsScreen(){const {spots,navigate,toggleSaved} = useApp(); const [saved,setSaved] = useState(false); const [query,setQuery] = useState(''); const list = useMemo(()=>spots.filter(x=>(!saved || x.saved) && `${x.name} ${x.region} ${x.species}`.toLowerCase().includes(query.toLowerCase())),[spots,saved,query]); return <Screen><Header eyebrow="Find your spot" title="Fishing Locations" right={<Pressable onPress={()=>navigate('Settings')} style={styles.settings}><Text>⚙</Text></Pressable>}/><View style={styles.search}><Field placeholder="Search locations, regions, fish…" value={query} onChangeText={setQuery} style={styles.flex}/><Pressable style={styles.add} onPress={()=>navigate('AddSpot')}><Text style={styles.addText}>＋</Text></Pressable></View><View style={styles.chips}><Chip label="Scenic Spots" active={!saved} onPress={()=>setSaved(false)}/><Chip label={`Saved (${spots.filter(x=>x.saved).length})`} active={saved} onPress={()=>setSaved(true)}/></View>{list.map((spot,i)=><FadeIn key={spot.id} delay={i * 70}><Pressable onPress={()=>navigate('SpotDetails',{id:spot.id})} style={styles.spot}><Image source={spotImages[spot.id] || fallbackSpotImage} style={styles.photo}/><Pressable style={styles.bookmark} onPress={()=>toggleSaved(spot.id)}><Text>{spot.saved ? '★' : '☆'}</Text></Pressable><View style={styles.body}><Text style={styles.region}>⌖  {spot.region}</Text><Text style={styles.name}>{spot.name}</Text><Text style={styles.about} numberOfLines={2}>{spot.about}</Text><View style={styles.chips}>{spot.species.slice(0,3).map(x=><Chip key={x} label={x}/>)}</View></View></Pressable></FadeIn>)}{list.length === 0 && <Card><Text style={styles.empty}>No spots match your search.</Text><Button title="Clear search" variant="secondary" onPress={()=>setQuery('')}/></Card>}</Screen>;}
-const styles = StyleSheet.create({flex:{flex:1},settings:{width:42,height:42,borderRadius:13,borderWidth:1,borderColor:colors.border,backgroundColor:colors.surface,alignItems:'center',justifyContent:'center'},search:{flexDirection:'row',gap:10},add:{width:52,height:48,borderRadius:15,backgroundColor:colors.orange,alignItems:'center',justifyContent:'center'},addText:{fontSize:28,color:'#071724'},chips:{flexDirection:'row',gap:8,flexWrap:'wrap',marginTop:14},spot:{marginTop:18,borderRadius:18,overflow:'hidden',backgroundColor:colors.surface,borderWidth:1,borderColor:colors.border},photo:{width:'100%',height:170},body:{padding:16},bookmark:{position:'absolute',right:13,top:13,width:36,height:36,borderRadius:11,backgroundColor:colors.orange,alignItems:'center',justifyContent:'center'},region:{color:colors.blue,fontSize:12,fontWeight:'700'},name:{color:colors.text,fontSize:21,fontWeight:'800',marginTop:5},about:{color:colors.muted,lineHeight:20,marginTop:6},empty:{color:colors.text,textAlign:'center',marginBottom:15}});
+export function LocationsScreen() {
+  const {spots, navigate, toggleSaved} = useApp();
+  const [saved, setSaved] = useState(false);
+  const [query, setQuery] = useState('');
+  const list = useMemo(
+    () =>
+      spots.filter(
+        x =>
+          (!saved || x.saved) &&
+          `${x.name} ${x.region} ${x.species}`
+            .toLowerCase()
+            .includes(query.toLowerCase()),
+      ),
+    [spots, saved, query],
+  );
+  return (
+    <Screen>
+      <Header
+        eyebrow="Find your spot"
+        title="Locations"
+        brandMark={appAssets.wavoraJourneyFishMark}
+        right={
+          <Pressable
+            onPress={() => navigate('Settings')}
+            style={styles.settings}>
+            <Text>⚙</Text>
+          </Pressable>
+        }
+      />
+      <View style={styles.search}>
+        <Field
+          placeholder="Search locations, regions, fish…"
+          value={query}
+          onChangeText={setQuery}
+          style={styles.flex}
+        />
+        <Pressable style={styles.add} onPress={() => navigate('AddSpot')}>
+          <Text style={styles.addText}>＋</Text>
+        </Pressable>
+      </View>
+      <View style={styles.chips}>
+        <Chip
+          label="Scenic Spots"
+          active={!saved}
+          onPress={() => setSaved(false)}
+        />
+        <Chip
+          label={`Saved (${spots.filter(x => x.saved).length})`}
+          active={saved}
+          onPress={() => setSaved(true)}
+        />
+      </View>
+      {list.map((spot, i) => (
+        <FadeIn key={spot.id} delay={i * 70}>
+          <Pressable
+            onPress={() => navigate('SpotDetails', {id: spot.id})}
+            style={styles.spot}>
+            <Image
+              source={spotImages[spot.id] || fallbackSpotImage}
+              style={styles.photo}
+            />
+            <Pressable
+              style={styles.bookmark}
+              onPress={() => toggleSaved(spot.id)}>
+              <Text>{spot.saved ? '★' : '☆'}</Text>
+            </Pressable>
+            <View style={styles.body}>
+              <Text style={styles.region}>⌖ {spot.region}</Text>
+              <Text style={styles.name}>{spot.name}</Text>
+              <Text style={styles.about} numberOfLines={2}>
+                {spot.about}
+              </Text>
+              <View style={styles.chips}>
+                {spot.species.slice(0, 3).map(x => (
+                  <Chip key={x} label={x} />
+                ))}
+              </View>
+            </View>
+          </Pressable>
+        </FadeIn>
+      ))}
+      {list.length === 0 && (
+        <Card>
+          <Text style={styles.empty}>No spots match your search.</Text>
+          <Button
+            title="Clear search"
+            variant="secondary"
+            onPress={() => setQuery('')}
+          />
+        </Card>
+      )}
+    </Screen>
+  );
+}
+const styles = StyleSheet.create({
+  flex: {flex: 1},
+  settings: {
+    width: 42,
+    height: 42,
+    borderRadius: 13,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  search: {flexDirection: 'row', gap: 10},
+  add: {
+    width: 52,
+    height: 48,
+    borderRadius: 15,
+    backgroundColor: colors.orange,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addText: {fontSize: 28, color: '#071724'},
+  chips: {flexDirection: 'row', gap: 8, flexWrap: 'wrap', marginTop: 14},
+  spot: {
+    marginTop: 18,
+    borderRadius: 18,
+    overflow: 'hidden',
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  photo: {width: '100%', height: 170},
+  body: {padding: 16},
+  bookmark: {
+    position: 'absolute',
+    right: 13,
+    top: 13,
+    width: 36,
+    height: 36,
+    borderRadius: 11,
+    backgroundColor: colors.orange,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  region: {color: colors.blue, fontSize: 12, fontWeight: '700'},
+  name: {color: colors.text, fontSize: 21, fontWeight: '800', marginTop: 5},
+  about: {color: colors.muted, lineHeight: 20, marginTop: 6},
+  empty: {color: colors.text, textAlign: 'center', marginBottom: 15},
+});

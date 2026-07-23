@@ -1,6 +1,3 @@
-export type TabName = 'Spots' | 'Map' | 'Sessions' | 'Game' | 'Draw';
-export type ScreenName = 'Home' | 'SpotDetails' | 'AddSpot' | 'NewSession' | 'LiveSession' | 'GameSetup' | 'GamePlay' | 'Gallery' | 'Settings';
-
 export type Spot = {
   id: string;
   name: string;
@@ -17,7 +14,20 @@ export type Spot = {
   custom?: boolean;
 };
 
-export type Session = {id: string; name: string; location: string; duration: string; catches: number; weight: string};
+export type Session = {
+  id: string;
+  name: string;
+  location: string;
+  duration: string;
+  catches: number;
+  weight: string;
+};
 
-export type ArtworkPoint = {x:number;y:number;color:string;size:number};
-export type Artwork = {id:string;title:string;prompt:string;createdAt:string;points:ArtworkPoint[]};
+export type ArtworkPoint = {x: number; y: number; color: string; size: number};
+export type Artwork = {
+  id: string;
+  title: string;
+  prompt: string;
+  createdAt: string;
+  points: ArtworkPoint[];
+};

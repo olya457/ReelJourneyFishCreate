@@ -5,6 +5,8 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run typecheck && npm run lint && npm test -- --runInBand",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest"

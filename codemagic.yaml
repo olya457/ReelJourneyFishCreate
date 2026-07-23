@@ -1,0 +1,58 @@
+workflows:
+  ios-release:
+    name: ReelJourneyFishCreate iOS
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: ReelJourneyFishCreate
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        # Set the final bundle identifier before enabling distribution.
+        bundle_identifier: YOUR_BUNDLE_IDENTIFIER
+      vars:
+        APP_STORE_APPLE_ID: YOUR_APP_STORE_APPLE_ID
+        XCODE_WORKSPACE: ReelJourneyFishCreate.xcworkspace
+        XCODE_SCHEME: ReelJourneyFishCreate
+      node: 20
+    cache:
+      cache_paths:
+        - $CM_BUILD_DIR/node_modules
+        - $HOME/Library/Caches/CocoaPods
+    scripts:
+      - name: Install JavaScript dependencies
+        script: npm ci
+      - name: TypeScript
+        script: npm run typecheck
+      - name: ESLint
+        script: npm run lint
+      - name: Unit tests
+        script: npm test -- --runInBand
+      - name: Install CocoaPods dependencies
+        script: cd ios && pod install
+      - name: Apply provisioning profiles
+        script: cd ios && xcode-project use-profiles
+      - name: Increment build number
+        script: |
+          cd "$CM_BUILD_DIR/ios"
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID")
+          agvtool new-version -all $((LATEST_BUILD_NUMBER + 1))
+      - name: Set export compliance
+        script: |
+          PLIST="$CM_BUILD_DIR/ios/ReelJourneyFishCreate/Info.plist"
+          PLIST_BUDDY=/usr/libexec/PlistBuddy
+          "$PLIST_BUDDY" -c "Delete :ITSAppUsesNonExemptEncryption" "$PLIST" || true
+          "$PLIST_BUDDY" -c "Add :ITSAppUsesNonExemptEncryption bool false" "$PLIST"
+      - name: Build IPA
+        script: |
+          xcode-project build-ipa \
+            --workspace "$CM_BUILD_DIR/ios/$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - $HOME/Library/Developer/Xcode/DerivedData/**/Build/**/*.dSYM
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_app_store: false

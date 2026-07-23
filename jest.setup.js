@@ -1,3 +1,4 @@
+/* eslint-env jest */
 jest.mock('@react-native-async-storage/async-storage', () => ({
   __esModule: true,
   default: {
@@ -11,8 +12,16 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 jest.mock('react-native-maps', () => {
   const React = require('react');
   const {View} = require('react-native');
-  const Map = React.forwardRef((props, ref) => React.createElement(View, {...props, ref}));
+  const Map = React.forwardRef((props, ref) =>
+    React.createElement(View, {...props, ref}),
+  );
   Map.Marker = View;
   Map.Callout = View;
-  return {__esModule: true, default: Map, Marker: View, Callout: View, PROVIDER_DEFAULT: undefined};
+  return {
+    __esModule: true,
+    default: Map,
+    Marker: View,
+    Callout: View,
+    PROVIDER_DEFAULT: undefined,
+  };
 });
