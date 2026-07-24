@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Artwork, Session, Spot} from '../types';
+import {Artwork, Session, Spot, TripPlan} from '../types';
 import {TabName} from '../navigation/types';
 
 export const APP_STORAGE_KEY = '@wavora_journey/app_state_v1';
@@ -10,6 +10,7 @@ export type PersistedAppState = {
   spots: Spot[];
   sessions: Session[];
   artworks: Artwork[];
+  tripPlans: TripPlan[];
 };
 
 const tabNames: TabName[] = ['Spots', 'Map', 'Sessions', 'Game', 'Draw'];
@@ -42,6 +43,9 @@ export function parsePersistedState(value: string): Partial<PersistedAppState> {
   }
   if (Array.isArray(parsed.artworks)) {
     result.artworks = parsed.artworks as Artwork[];
+  }
+  if (Array.isArray(parsed.tripPlans)) {
+    result.tripPlans = parsed.tripPlans as TripPlan[];
   }
   return result;
 }

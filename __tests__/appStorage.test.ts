@@ -15,6 +15,7 @@ const state: PersistedAppState = {
   spots: [],
   sessions: [],
   artworks: [],
+  tripPlans: [],
 };
 
 beforeEach(() => {

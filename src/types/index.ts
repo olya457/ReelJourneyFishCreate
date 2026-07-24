@@ -31,3 +31,16 @@ export type Artwork = {
   createdAt: string;
   points: ArtworkPoint[];
 };
+
+export type TripPlan = {
+  id: string;
+  spotId: string;
+  title: string;
+  date: string;
+  timeWindow: string;
+  technique: string;
+  targetSpecies: string;
+  readiness: number;
+  checklist: {id: string; label: string; done: boolean}[];
+  createdAt: string;
+};

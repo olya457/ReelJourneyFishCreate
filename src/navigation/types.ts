@@ -13,7 +13,7 @@ export type RouteParams = {
     coordinates: [number, number];
   };
   GameSetup: undefined;
-  GamePlay: {players: string[]; rounds: number};
+  GamePlay: {planId: string};
   Gallery: undefined;
   Settings: undefined;
 };

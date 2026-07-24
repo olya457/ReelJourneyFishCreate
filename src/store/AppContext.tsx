@@ -15,7 +15,7 @@ import {
   PersistedAppState,
   saveAppState,
 } from '../storage/appStorage';
-import {Artwork, Session, Spot} from '../types';
+import {Artwork, Session, Spot, TripPlan} from '../types';
 
 type AppState = {
   hydrated: boolean;
@@ -34,6 +34,10 @@ type AppState = {
   artworks: Artwork[];
   addArtwork(artwork: Artwork): void;
   deleteArtwork(id: string): void;
+  tripPlans: TripPlan[];
+  addTripPlan(plan: TripPlan): void;
+  toggleTripItem(planId: string, itemId: string): void;
+  deleteTripPlan(id: string): void;
 };
 
 const Context = createContext<AppState | null>(null);
@@ -46,6 +50,7 @@ export function AppProvider({children}: PropsWithChildren) {
   const [spots, setSpots] = useState(initialSpots);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const [tripPlans, setTripPlans] = useState<TripPlan[]>([]);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
@@ -71,6 +76,9 @@ export function AppProvider({children}: PropsWithChildren) {
         }
         if (saved.artworks) {
           setArtworks(saved.artworks);
+        }
+        if (saved.tripPlans) {
+          setTripPlans(saved.tripPlans);
         }
       })
       .catch(error => {
@@ -98,13 +106,14 @@ export function AppProvider({children}: PropsWithChildren) {
         spots,
         sessions,
         artworks,
+        tripPlans,
       };
       saveAppState(state).catch(error => {
         console.warn('Unable to save app state', error);
       });
     }, 180);
     return () => clearTimeout(saveTimer.current);
-  }, [hydrated, onboarded, tab, spots, sessions, artworks]);
+  }, [hydrated, onboarded, tab, spots, sessions, artworks, tripPlans]);
 
   const route = stack[stack.length - 1];
   const navigate: Navigate = useCallback(
@@ -141,8 +150,35 @@ export function AppProvider({children}: PropsWithChildren) {
       addArtwork: artwork => setArtworks(current => [artwork, ...current]),
       deleteArtwork: id =>
         setArtworks(current => current.filter(item => item.id !== id)),
+      tripPlans,
+      addTripPlan: plan => setTripPlans(current => [plan, ...current]),
+      toggleTripItem: (planId, itemId) =>
+        setTripPlans(current =>
+          current.map(plan =>
+            plan.id !== planId
+              ? plan
+              : {
+                  ...plan,
+                  checklist: plan.checklist.map(item =>
+                    item.id === itemId ? {...item, done: !item.done} : item,
+                  ),
+                },
+          ),
+        ),
+      deleteTripPlan: id =>
+        setTripPlans(current => current.filter(plan => plan.id !== id)),
     }),
-    [hydrated, onboarded, tab, route, navigate, spots, sessions, artworks],
+    [
+      hydrated,
+      onboarded,
+      tab,
+      route,
+      navigate,
+      spots,
+      sessions,
+      artworks,
+      tripPlans,
+    ],
   );
 
   return <Context.Provider value={value}>{children}</Context.Provider>;

@@ -1,224 +1,78 @@
-import React, {useMemo, useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import {Button, FadeIn, Header, Screen} from '../../components/UI';
-import {honestQuestions} from '../../data/content';
+import React from 'react';
+import {Alert, Pressable, StyleSheet, Text, View} from 'react-native';
+import {Button, Card, Empty, Header, Screen} from '../../components/UI';
 import {colors} from '../../constants/theme';
 import {AppRoute} from '../../navigation/types';
 import {useApp} from '../../store/AppContext';
-type Answer = {truth: number; lie: number};
-export function GamePlayScreen({
-  route,
-}: {
-  route: Extract<AppRoute, {name: 'GamePlay'}>;
-}) {
-  const {back} = useApp();
-  const players = route.params.players;
-  const rounds = route.params.rounds;
-  const [turn, setTurn] = useState(0);
-  const [round, setRound] = useState(1);
-  const [finished, setFinished] = useState(false);
-  const [answers, setAnswers] = useState<Answer[]>(
-    players.map(() => ({truth: 0, lie: 0})),
-  );
-  const questionIndex = (round - 1) * players.length + turn;
-  const question = honestQuestions[questionIndex % honestQuestions.length];
-  const choose = (choice: 'truth' | 'lie') => {
-    setAnswers(current =>
-      current.map((answer, index) =>
-        index === turn ? {...answer, [choice]: answer[choice] + 1} : answer,
-      ),
-    );
-    if (turn === players.length - 1) {
-      if (round === rounds) {
-        setFinished(true);
-      } else {
-        setTurn(0);
-        setRound(value => value + 1);
-      }
-    } else {
-      setTurn(value => value + 1);
-    }
-  };
-  const totals = useMemo(
-    () =>
-      answers.reduce(
-        (result, item) => ({
-          truth: result.truth + item.truth,
-          lie: result.lie + item.lie,
-        }),
-        {truth: 0, lie: 0},
-      ),
-    [answers],
-  );
-  if (finished) {
-    return (
-      <Screen>
-        <Header title="Game Complete" onBack={back} />
-        <View style={styles.finish}>
-          <Text style={styles.trophy}>🏆</Text>
-          <Text style={styles.finishTitle}>Thanks for being honest!</Text>
-          <Text style={styles.finishMeta}>
-            {totals.truth} truths · {totals.lie} lies
-          </Text>
-        </View>
-        {players.map((player, index) => (
-          <View key={`${player}-${index}`} style={styles.result}>
-            <View>
-              <Text style={styles.resultName}>{player}</Text>
-              <Text style={styles.resultDetail}>
-                Truth {answers[index].truth} · Lie {answers[index].lie}
-              </Text>
-            </View>
-            <Text style={styles.resultTotal}>
-              {answers[index].truth + answers[index].lie}
-            </Text>
-          </View>
-        ))}
-        <View style={styles.return}>
-          <Button title="Return to Game Menu" onPress={back} />
-        </View>
-      </Screen>
-    );
+
+export function GamePlayScreen({route}: {route: Extract<AppRoute, {name: 'GamePlay'}>}) {
+  const {back, tripPlans, spots, toggleTripItem, deleteTripPlan} = useApp();
+  const plan = tripPlans.find(item => item.id === route.params.planId);
+  if (!plan) {
+    return <Screen><Header title="Field brief" onBack={back} /><Empty icon="🧭" title="Brief not found" text="This plan may have been removed." /></Screen>;
   }
+  const spot = spots.find(item => item.id === plan.spotId);
+  const checked = plan.checklist.filter(item => item.done).length;
+  const remove = () => Alert.alert('Delete field brief?', 'The checklist and plan will be removed.', [
+    {text: 'Cancel', style: 'cancel'},
+    {text: 'Delete', style: 'destructive', onPress: () => { deleteTripPlan(plan.id); back(); }},
+  ]);
   return (
     <Screen>
-      <Header
-        eyebrow={`Round ${round} of ${rounds}`}
-        title={players[turn]}
-        onBack={back}
-      />
-      <Text style={styles.turnLabel}>CURRENT PLAYER</Text>
-      <View style={styles.avatar}>
-        <Text style={styles.avatarText}>
-          {players[turn][0]?.toUpperCase() || 'P'}
-        </Text>
-      </View>
-      <FadeIn key={`${round}-${turn}`} style={styles.questionCard}>
-        <Text style={styles.questionType}>HONEST QUESTION</Text>
-        <Text style={styles.question}>{question}</Text>
-      </FadeIn>
-      <Text style={styles.instruction}>Answer aloud, then choose:</Text>
-      <View style={styles.choiceRow}>
-        <View style={styles.choice}>
-          <Button
-            title="✓ Truth"
-            variant="green"
-            onPress={() => choose('truth')}
-          />
+      <Header eyebrow={`${plan.date} · ${plan.timeWindow}`} title={plan.title} onBack={back} />
+      <View style={styles.scoreCard}>
+        <View>
+          <Text style={styles.scoreLabel}>CONDITION FIT</Text>
+          <Text style={styles.scoreCopy}>{plan.technique} · {plan.targetSpecies}</Text>
         </View>
-        <View style={styles.choice}>
-          <Button
-            title="✦ Lie"
-            variant="danger"
-            onPress={() => choose('lie')}
-          />
-        </View>
+        <Text style={styles.score}>{plan.readiness}</Text>
       </View>
-      <View style={styles.players}>
-        {players.map((player, index) => (
-          <View
-            key={`${player}-${index}`}
-            style={[styles.player, index === turn && styles.playerActive]}>
-            <Text
-              style={[
-                styles.playerName,
-                index === turn && styles.playerNameActive,
-              ]}
-              numberOfLines={1}>
-              {player}
-            </Text>
-            <Text
-              style={[
-                styles.answerCount,
-                index === turn && styles.playerNameActive,
-              ]}>
-              {answers[index].truth + answers[index].lie}/{rounds}
-            </Text>
+      <Card style={styles.location}>
+        <Text style={styles.locationName}>⌖ {spot?.name ?? 'Unknown water'}</Text>
+        <Text style={styles.locationMeta}>{spot?.region}</Text>
+        <Text style={styles.locationText}>{spot?.conditions}</Text>
+      </Card>
+      <View style={styles.sectionRow}>
+        <Text style={styles.section}>PACK & VERIFY</Text>
+        <Text style={styles.count}>{checked}/{plan.checklist.length}</Text>
+      </View>
+      {plan.checklist.map(item => (
+        <Pressable key={item.id} onPress={() => toggleTripItem(plan.id, item.id)} style={[styles.item, item.done && styles.itemDone]}>
+          <View style={[styles.check, item.done && styles.checkDone]}>
+            <Text style={styles.checkText}>{item.done ? '✓' : ''}</Text>
           </View>
-        ))}
+          <Text style={[styles.itemText, item.done && styles.itemTextDone]}>{item.label}</Text>
+        </Pressable>
+      ))}
+      <View style={styles.rule}>
+        <Text style={styles.ruleTitle}>LOCAL RULE NOTE</Text>
+        <Text style={styles.ruleText}>{spot?.rules}</Text>
       </View>
+      <Button title="Delete brief" variant="danger" onPress={remove} />
     </Screen>
   );
 }
+
 const styles = StyleSheet.create({
-  turnLabel: {
-    color: colors.muted,
-    textAlign: 'center',
-    fontSize: 10,
-    fontWeight: '800',
-    marginTop: 6,
-  },
-  avatar: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.orange,
-    marginTop: 8,
-  },
-  avatarText: {fontSize: 25, fontWeight: '900', color: colors.background},
-  questionCard: {
-    flex: 1,
-    maxHeight: 320,
-    minHeight: 220,
-    marginVertical: 22,
-    borderRadius: 22,
-    padding: 24,
-    backgroundColor: '#1689D0',
-    justifyContent: 'center',
-  },
-  questionType: {
-    color: '#D9F1FF',
-    fontSize: 11,
-    fontWeight: '900',
-    marginBottom: 18,
-  },
-  question: {color: 'white', fontSize: 25, lineHeight: 33, fontWeight: '900'},
-  instruction: {color: colors.muted, textAlign: 'center', marginBottom: 12},
-  choiceRow: {flexDirection: 'row', gap: 10},
-  choice: {flex: 1},
-  players: {flexDirection: 'row', gap: 7, marginTop: 'auto', paddingTop: 22},
-  player: {
-    flex: 1,
-    padding: 10,
-    borderRadius: 12,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  playerActive: {backgroundColor: colors.orange, borderColor: colors.orange},
-  playerName: {color: colors.muted, fontSize: 11, fontWeight: '700'},
-  playerNameActive: {color: colors.background},
-  answerCount: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: '900',
-    marginTop: 3,
-  },
-  finish: {alignItems: 'center', paddingVertical: 20},
-  trophy: {fontSize: 54},
-  finishTitle: {
-    color: colors.text,
-    fontSize: 23,
-    fontWeight: '900',
-    marginTop: 8,
-  },
-  finishMeta: {color: colors.orange, fontWeight: '800', marginTop: 7},
-  result: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: colors.surface,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 9,
-  },
-  resultName: {color: colors.text, fontSize: 16, fontWeight: '800'},
-  resultDetail: {color: colors.muted, marginTop: 4},
-  resultTotal: {fontSize: 24, color: colors.orange, fontWeight: '900'},
-  return: {marginTop: 18},
+  scoreCard: {backgroundColor: '#123C3A', borderRadius: 18, padding: 17, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
+  scoreLabel: {color: '#72D8C1', fontSize: 10, fontWeight: '900', letterSpacing: 1},
+  scoreCopy: {color: 'white', marginTop: 5, fontWeight: '700'},
+  score: {color: '#72D8C1', fontSize: 36, fontWeight: '900'},
+  location: {marginTop: 12},
+  locationName: {color: colors.text, fontSize: 17, fontWeight: '900'},
+  locationMeta: {color: colors.orange, marginTop: 4, fontWeight: '700'},
+  locationText: {color: colors.muted, lineHeight: 19, marginTop: 9},
+  sectionRow: {flexDirection: 'row', justifyContent: 'space-between', marginTop: 22, marginBottom: 10},
+  section: {color: colors.muted, fontSize: 10, fontWeight: '900', letterSpacing: 1.2},
+  count: {color: colors.orange, fontWeight: '900'},
+  item: {flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, backgroundColor: colors.surface, borderRadius: 14, marginBottom: 8, borderWidth: 1, borderColor: colors.border},
+  itemDone: {backgroundColor: '#0E332E', borderColor: '#236A5B'},
+  check: {width: 24, height: 24, borderRadius: 7, borderWidth: 2, borderColor: colors.muted, alignItems: 'center', justifyContent: 'center'},
+  checkDone: {backgroundColor: colors.green, borderColor: colors.green},
+  checkText: {color: '#071724', fontWeight: '900'},
+  itemText: {color: colors.text, flex: 1, fontWeight: '700'},
+  itemTextDone: {color: '#8FCABD', textDecorationLine: 'line-through'},
+  rule: {padding: 15, backgroundColor: '#3A280E', borderRadius: 15, marginVertical: 14},
+  ruleTitle: {color: colors.orange, fontSize: 10, fontWeight: '900'},
+  ruleText: {color: '#E3D2AE', lineHeight: 18, marginTop: 6, fontSize: 12},
 });
