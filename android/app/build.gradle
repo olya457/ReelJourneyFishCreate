@@ -77,9 +77,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.reeljourney.fishcreate"
+    namespace "com.wildwaterjourney"
     defaultConfig {
-        applicationId "com.reeljourney.fishcreate"
+        applicationId "com.wildwaterjourney"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

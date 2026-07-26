@@ -59,7 +59,7 @@ export function OnboardingScreen() {
     return (
       <View style={styles.loader}>
         <FadeIn style={styles.brand}>
-          <Text style={styles.logo}>Wavora Journey</Text>
+          <Text style={styles.logo}>Wild Water Journey</Text>
           <Text style={styles.tag}>F I S H & C R E A T E</Text>
           <Animated.View
             style={[
