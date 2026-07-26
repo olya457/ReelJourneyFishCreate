@@ -1,4 +1,4 @@
-package com.reeljourneyfishcreate
+package com.reeljourney.fishcreate
 
 import android.app.Application
 import com.facebook.react.PackageList

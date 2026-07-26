@@ -1,7 +1,7 @@
 import React, {useRef, useState} from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import MapView, {Callout, Marker, PROVIDER_DEFAULT} from 'react-native-maps';
-import {Button, Field} from '../../components/UI';
+import {Field} from '../../components/UI';
 import {colors} from '../../constants/theme';
 import {useApp} from '../../store/AppContext';
 import {Spot} from '../../types';
@@ -68,27 +68,23 @@ export function MapScreen() {
         </Pressable>
       </View>
       {selected && (
-        <View style={styles.preview}>
-          <Pressable
-            style={styles.close}
-            onPress={() => setSelected(undefined)}>
-            <Text style={styles.closeText}>×</Text>
-          </Pressable>
-          <Text style={styles.name}>{selected.name}</Text>
-          <Text style={styles.about} numberOfLines={2}>
-            {selected.about}
-          </Text>
-          <View style={styles.actions}>
-            <View style={styles.flex}>
-              <Button
-                title="View Details"
-                variant="secondary"
-                onPress={() => navigate('SpotDetails', {id: selected.id})}
-              />
-            </View>
-            <View style={styles.flex}>
-              <Button title="Center Map" onPress={() => focus(selected)} />
-            </View>
+        <View style={styles.previewOverlay} pointerEvents="box-none">
+          <View style={styles.preview}>
+            <Pressable
+              style={styles.close}
+              onPress={() => setSelected(undefined)}
+              hitSlop={12}>
+              <Text style={styles.closeText}>×</Text>
+            </Pressable>
+            <Text style={styles.name}>{selected.name}</Text>
+            <Text style={styles.about} numberOfLines={2}>
+              {selected.about}
+            </Text>
+            <Pressable
+              style={styles.detailsButton}
+              onPress={() => navigate('SpotDetails', {id: selected.id})}>
+              <Text style={styles.detailsButtonText}>View Details</Text>
+            </Pressable>
           </View>
         </View>
       )}
@@ -117,23 +113,55 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   locateText: {fontSize: 25, color: colors.blue},
+  previewOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    zIndex: 20,
+    elevation: 20,
+  },
   preview: {
-    position: 'absolute',
-    left: 16,
-    right: 16,
-    bottom: 100,
+    width: '100%',
+    maxWidth: 380,
     backgroundColor: colors.surface,
-    padding: 17,
+    padding: 18,
+    paddingTop: 20,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: colors.border,
+    zIndex: 21,
+    elevation: 21,
   },
-  close: {position: 'absolute', right: 12, top: 8, padding: 4},
-  closeText: {color: colors.muted, fontSize: 22},
+  close: {
+    position: 'absolute',
+    right: 12,
+    top: 10,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface2,
+    zIndex: 22,
+    elevation: 22,
+  },
+  closeText: {color: colors.text, fontSize: 22, lineHeight: 24},
   name: {fontSize: 20, color: colors.text, fontWeight: '800'},
-  about: {color: colors.muted, lineHeight: 18, marginTop: 5, marginRight: 15},
-  actions: {flexDirection: 'row', gap: 10, marginTop: 14},
-  flex: {flex: 1},
+  about: {color: colors.muted, lineHeight: 18, marginTop: 5, marginRight: 20},
+  detailsButton: {
+    marginTop: 16,
+    minHeight: 48,
+    borderRadius: 14,
+    backgroundColor: colors.orange,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  detailsButtonText: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '800',
+  },
   callout: {width: 180, padding: 5},
   calloutTitle: {fontWeight: '800', fontSize: 16},
   details: {color: '#287FC0', marginTop: 5},

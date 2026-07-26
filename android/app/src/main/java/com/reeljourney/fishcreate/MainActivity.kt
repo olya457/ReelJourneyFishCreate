@@ -1,4 +1,4 @@
-package com.reeljourneyfishcreate
+package com.reeljourney.fishcreate
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
