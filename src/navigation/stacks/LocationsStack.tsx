@@ -3,12 +3,15 @@ import {AddSpotScreen} from '../../screens/locations/AddSpotScreen';
 import {SpotDetailsScreen} from '../../screens/locations/SpotDetailsScreen';
 import {AppRoute} from '../types';
 
-type LocationsRoute = Extract<AppRoute, {name: 'SpotDetails' | 'AddSpot'}>;
+type LocationsRoute = Extract<
+  AppRoute,
+  {name: 'SpotDetails' | 'AddSpot' | 'EditSpot'}
+>;
 
 export function LocationsStack({route}: {route: LocationsRoute}) {
   return route.name === 'SpotDetails' ? (
     <SpotDetailsScreen route={route} />
   ) : (
-    <AddSpotScreen />
+    <AddSpotScreen route={route} />
   );
 }

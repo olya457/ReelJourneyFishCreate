@@ -1,6 +1,6 @@
 import React, {useMemo, useState} from 'react';
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
-import {fallbackSpotImage, spotImages} from '../../assets/images';
+import {spotImages} from '../../assets/images';
 import {appAssets} from '../../assets/images';
 import {
   Button,
@@ -70,14 +70,18 @@ export function LocationsScreen() {
           <Pressable
             onPress={() => navigate('SpotDetails', {id: spot.id})}
             style={styles.spot}>
-            <Image
-              source={
-                spot.photoUri
-                  ? {uri: spot.photoUri}
-                  : spotImages[spot.id] || fallbackSpotImage
-              }
-              style={styles.photo}
-            />
+            {spot.photoUri || spotImages[spot.id] ? (
+              <Image
+                source={
+                  spot.photoUri ? {uri: spot.photoUri} : spotImages[spot.id]
+                }
+                style={styles.photo}
+              />
+            ) : (
+              <View style={[styles.photo, styles.emptyPhoto]}>
+                <Text style={styles.emptyPhotoText}>No photo</Text>
+              </View>
+            )}
             <Pressable
               style={styles.bookmark}
               onPress={() => toggleSaved(spot.id)}>
@@ -143,6 +147,12 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   photo: {width: '100%', height: 170},
+  emptyPhoto: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface2,
+  },
+  emptyPhotoText: {color: colors.muted, fontWeight: '700'},
   body: {padding: 16},
   bookmark: {
     position: 'absolute',

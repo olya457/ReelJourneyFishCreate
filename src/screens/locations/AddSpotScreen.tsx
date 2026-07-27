@@ -13,15 +13,28 @@ import {
 import {launchImageLibrary} from 'react-native-image-picker';
 import {Button, Field, Header, Label, Screen} from '../../components/UI';
 import {colors} from '../../constants/theme';
+import {AppRoute} from '../../navigation/types';
 import {useApp} from '../../store/AppContext';
 
-export function AddSpotScreen() {
-  const {addSpot, back} = useApp();
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [species, setSpecies] = useState('');
-  const [photoUri, setPhotoUri] = useState<string>();
-  const [coordinates, setCoordinates] = useState<[number, number]>();
+export function AddSpotScreen({
+  route,
+}: {
+  route: Extract<AppRoute, {name: 'AddSpot' | 'EditSpot'}>;
+}) {
+  const {spots, addSpot, updateSpot, back} = useApp();
+  const existing =
+    route.name === 'EditSpot'
+      ? spots.find(item => item.id === route.params.id)
+      : undefined;
+  const [name, setName] = useState(existing?.name ?? '');
+  const [description, setDescription] = useState(existing?.about ?? '');
+  const [species, setSpecies] = useState(existing?.species.join(', ') ?? '');
+  const [photoUri, setPhotoUri] = useState<string | undefined>(
+    existing?.photoUri,
+  );
+  const [coordinates, setCoordinates] = useState<[number, number] | undefined>(
+    existing?.coordinates,
+  );
   const [locating, setLocating] = useState(false);
 
   const addPhoto = async () => {
@@ -87,30 +100,37 @@ export function AddSpotScreen() {
     if (!name.trim()) {
       return;
     }
-    addSpot({
-      id: `custom-${Date.now()}`,
+    const spot = {
+      id: existing?.id ?? `custom-${Date.now()}`,
       name: name.trim(),
-      region: 'Custom spot',
-      country: '',
+      region: existing?.region ?? 'Custom spot',
+      country: existing?.country ?? '',
       about: description || 'A personal fishing location.',
-      conditions: 'Add notes during your next visit.',
-      bestTime: 'Any time',
-      facilities: [],
+      conditions:
+        existing?.conditions ?? 'Add notes during your next visit.',
+      bestTime: existing?.bestTime ?? 'Any time',
+      facilities: existing?.facilities ?? [],
       species: species
         .split(',')
         .map(x => x.trim())
         .filter(Boolean),
-      rules: 'Check local regulations before fishing.',
+      rules:
+        existing?.rules ?? 'Check local regulations before fishing.',
       coordinates: coordinates ?? [0, 0],
       photoUri,
-      saved: true,
+      saved: existing?.saved ?? true,
       custom: true,
-    });
+    };
+    if (existing) {
+      updateSpot(spot);
+    } else {
+      addSpot(spot);
+    }
     back();
   };
   return (
     <Screen>
-      <Header title="Add Location" onBack={back} />
+      <Header title={existing ? 'Edit Location' : 'Add Location'} onBack={back} />
       <Label>Photos</Label>
       <View style={styles.photoRow}>
         <Pressable style={styles.photoPlaceholder} onPress={addPhoto}>
@@ -147,7 +167,11 @@ export function AddSpotScreen() {
         placeholder="Smallmouth Bass, Perch"
       />
       <View style={styles.save}>
-        <Button title="Save Location" disabled={!name.trim()} onPress={save} />
+        <Button
+          title={existing ? 'Save Changes' : 'Save Location'}
+          disabled={!name.trim()}
+          onPress={save}
+        />
       </View>
     </Screen>
   );

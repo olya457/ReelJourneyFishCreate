@@ -12,6 +12,7 @@ export function ModalStack({route}: {route: ModalRoute}) {
   switch (route.name) {
     case 'SpotDetails':
     case 'AddSpot':
+    case 'EditSpot':
       return <LocationsStack route={route} />;
     case 'NewSession':
     case 'LiveSession':
