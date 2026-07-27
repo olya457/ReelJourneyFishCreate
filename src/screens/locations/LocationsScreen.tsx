@@ -71,7 +71,11 @@ export function LocationsScreen() {
             onPress={() => navigate('SpotDetails', {id: spot.id})}
             style={styles.spot}>
             <Image
-              source={spotImages[spot.id] || fallbackSpotImage}
+              source={
+                spot.photoUri
+                  ? {uri: spot.photoUri}
+                  : spotImages[spot.id] || fallbackSpotImage
+              }
               style={styles.photo}
             />
             <Pressable

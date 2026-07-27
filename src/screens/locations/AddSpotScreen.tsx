@@ -1,12 +1,88 @@
+import Geolocation from '@react-native-community/geolocation';
 import React, {useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {
+  Alert,
+  Image,
+  PermissionsAndroid,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import {launchImageLibrary} from 'react-native-image-picker';
 import {Button, Field, Header, Label, Screen} from '../../components/UI';
+import {colors} from '../../constants/theme';
 import {useApp} from '../../store/AppContext';
+
 export function AddSpotScreen() {
   const {addSpot, back} = useApp();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [species, setSpecies] = useState('');
+  const [photoUri, setPhotoUri] = useState<string>();
+  const [coordinates, setCoordinates] = useState<[number, number]>();
+  const [locating, setLocating] = useState(false);
+
+  const addPhoto = async () => {
+    const result = await launchImageLibrary({
+      mediaType: 'photo',
+      selectionLimit: 1,
+    });
+    if (result.didCancel) {
+      return;
+    }
+    if (result.errorCode) {
+      Alert.alert('Photo unavailable', result.errorMessage);
+      return;
+    }
+    setPhotoUri(result.assets?.[0]?.uri);
+  };
+
+  const addLocation = async () => {
+    if (Platform.OS === 'android') {
+      const permission = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      );
+      if (permission !== PermissionsAndroid.RESULTS.GRANTED) {
+        Alert.alert(
+          'Location permission required',
+          'Allow location access to mark your current fishing spot.',
+        );
+        return;
+      }
+    } else {
+      const granted = await new Promise<boolean>(resolve => {
+        Geolocation.requestAuthorization(
+          () => resolve(true),
+          () => resolve(false),
+        );
+      });
+      if (!granted) {
+        Alert.alert(
+          'Location permission required',
+          'Allow location access to mark your current fishing spot.',
+        );
+        return;
+      }
+    }
+    setLocating(true);
+    Geolocation.getCurrentPosition(
+      position => {
+        setCoordinates([
+          position.coords.latitude,
+          position.coords.longitude,
+        ]);
+        setLocating(false);
+      },
+      error => {
+        setLocating(false);
+        Alert.alert('Location unavailable', error.message);
+      },
+      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
+    );
+  };
+
   const save = () => {
     if (!name.trim()) {
       return;
@@ -25,7 +101,8 @@ export function AddSpotScreen() {
         .map(x => x.trim())
         .filter(Boolean),
       rules: 'Check local regulations before fishing.',
-      coordinates: [0, 0],
+      coordinates: coordinates ?? [0, 0],
+      photoUri,
       saved: true,
       custom: true,
     });
@@ -36,18 +113,26 @@ export function AddSpotScreen() {
       <Header title="Add Location" onBack={back} />
       <Label>Photos</Label>
       <View style={styles.photoRow}>
-        {['＋ Add', 'Photo', 'Photo'].map(x => (
-          <View key={x} style={styles.photoPlaceholder}>
-            <Text style={styles.photoText}>{x}</Text>
-          </View>
-        ))}
+        <Pressable style={styles.photoPlaceholder} onPress={addPhoto}>
+          {photoUri ? (
+            <Image source={{uri: photoUri}} style={styles.photo} />
+          ) : (
+            <Text style={styles.photoText}>＋ Add</Text>
+          )}
+        </Pressable>
       </View>
       <Label>Location Name *</Label>
       <Field value={name} onChangeText={setName} placeholder="Hidden Creek" />
       <Label>Mark on Map</Label>
-      <View style={styles.mapPlaceholder}>
-        <Text style={styles.mapMarker}>Location</Text>
-      </View>
+      <Pressable style={styles.mapPlaceholder} onPress={addLocation}>
+        <Text style={styles.mapMarker}>
+          {locating
+            ? 'Finding location…'
+            : coordinates
+              ? `${coordinates[0].toFixed(5)}, ${coordinates[1].toFixed(5)}`
+              : '＋ Add current location'}
+        </Text>
+      </Pressable>
       <Label>Description</Label>
       <Field
         multiline
@@ -69,17 +154,19 @@ export function AddSpotScreen() {
 }
 
 const styles = StyleSheet.create({
-  photoRow: {flexDirection: 'row', gap: 10},
+  photoRow: {flexDirection: 'row'},
   photoPlaceholder: {
     height: 82,
-    flex: 1,
+    width: 110,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: '#24506A',
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   photoText: {color: '#8FA8B9'},
+  photo: {width: '100%', height: '100%'},
   mapPlaceholder: {
     height: 150,
     backgroundColor: '#103A57',
@@ -87,6 +174,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  mapMarker: {color: '#8FA8B9', fontWeight: '700'},
+  mapMarker: {color: colors.text, fontWeight: '700'},
   save: {marginTop: 22},
 });

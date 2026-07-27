@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {Alert, Pressable, StyleSheet, Text, View} from 'react-native';
 import MapView, {Callout, Marker, PROVIDER_DEFAULT} from 'react-native-maps';
 import {Field} from '../../components/UI';
 import {colors} from '../../constants/theme';
@@ -10,6 +10,7 @@ export function MapScreen() {
   const {spots, navigate} = useApp();
   const mapRef = useRef<MapView>(null);
   const [selected, setSelected] = useState<Spot>();
+  const [query, setQuery] = useState('');
   const focus = (spot: Spot) => {
     setSelected(spot);
     mapRef.current?.animateToRegion(
@@ -21,6 +22,22 @@ export function MapScreen() {
       },
       500,
     );
+  };
+  const search = () => {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) {
+      return;
+    }
+    const result = spots.find(spot =>
+      `${spot.name} ${spot.region} ${spot.country}`
+        .toLowerCase()
+        .includes(normalized),
+    );
+    if (result) {
+      focus(result);
+    } else {
+      Alert.alert('Location not found', 'Try another lake, region, or country.');
+    }
   };
   return (
     <View style={styles.screen}>
@@ -60,11 +77,16 @@ export function MapScreen() {
           ))}
       </MapView>
       <View style={styles.search}>
-        <Field placeholder="Search the fishing map" style={styles.field} />
-        <Pressable
-          style={styles.locate}
-          onPress={() => selected && focus(selected)}>
-          <Text style={styles.locateText}>⌖</Text>
+        <Field
+          placeholder="Search the fishing map"
+          value={query}
+          onChangeText={setQuery}
+          onSubmitEditing={search}
+          returnKeyType="search"
+          style={styles.field}
+        />
+        <Pressable style={styles.locate} onPress={search}>
+          <Text style={styles.locateText}>⌕</Text>
         </Pressable>
       </View>
       {selected && (
