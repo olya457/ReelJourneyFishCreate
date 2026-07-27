@@ -1,7 +1,7 @@
 import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import MapView, {Callout, Marker, PROVIDER_DEFAULT} from 'react-native-maps';
-import {fallbackSpotImage, spotImages} from '../../assets/images';
+import {spotImages} from '../../assets/images';
 import {Button, Card, Chip, FadeIn, Header, Screen} from '../../components/UI';
 import {colors} from '../../constants/theme';
 import {useApp} from '../../store/AppContext';
@@ -12,7 +12,7 @@ export function SpotDetailsScreen({
 }: {
   route: Extract<AppRoute, {name: 'SpotDetails'}>;
 }) {
-  const {spots, back, toggleSaved, setTab} = useApp();
+  const {spots, back, navigate, toggleSaved, setTab} = useApp();
   const spot = spots.find(item => item.id === route.params.id) ?? spots[0];
   const coordinate = {
     latitude: spot.coordinates[0],
@@ -24,14 +24,18 @@ export function SpotDetailsScreen({
   };
   return (
     <Screen style={styles.screen}>
-      <Image
-        source={
-          spot.photoUri
-            ? {uri: spot.photoUri}
-            : spotImages[spot.id] || fallbackSpotImage
-        }
-        style={styles.hero}
-      />
+      {spot.photoUri || spotImages[spot.id] ? (
+        <Image
+          source={
+            spot.photoUri ? {uri: spot.photoUri} : spotImages[spot.id]
+          }
+          style={styles.hero}
+        />
+      ) : (
+        <View style={[styles.hero, styles.emptyHero]}>
+          <Text style={styles.emptyPhotoText}>No photo</Text>
+        </View>
+      )}
       <View style={styles.content}>
         <Header
           eyebrow={`⌖ ${spot.region} · ${spot.country}`}
@@ -44,6 +48,15 @@ export function SpotDetailsScreen({
             variant={spot.saved ? 'green' : 'primary'}
             onPress={() => toggleSaved(spot.id)}
           />
+          {spot.custom && (
+            <View style={styles.editButton}>
+              <Button
+                title="Edit Location"
+                variant="secondary"
+                onPress={() => navigate('EditSpot', {id: spot.id})}
+              />
+            </View>
+          )}
           <Text style={styles.heading}>About</Text>
           <Text style={styles.copy}>{spot.about}</Text>
           <Text style={styles.heading}>Location</Text>
@@ -122,6 +135,13 @@ export function SpotDetailsScreen({
 const styles = StyleSheet.create({
   screen: {paddingHorizontal: 0, paddingTop: 0},
   hero: {width: '100%', height: 300},
+  emptyHero: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+  },
+  emptyPhotoText: {color: colors.muted, fontWeight: '700'},
+  editButton: {marginTop: 10},
   content: {
     paddingHorizontal: 18,
     marginTop: -20,

@@ -29,6 +29,7 @@ type AppState = {
   spots: Spot[];
   toggleSaved(id: string): void;
   addSpot(spot: Spot): void;
+  updateSpot(spot: Spot): void;
   sessions: Session[];
   addSession(session: Session): void;
   artworks: Artwork[];
@@ -144,6 +145,10 @@ export function AppProvider({children}: PropsWithChildren) {
           ),
         ),
       addSpot: spot => setSpots(current => [spot, ...current]),
+      updateSpot: spot =>
+        setSpots(current =>
+          current.map(item => (item.id === spot.id ? spot : item)),
+        ),
       sessions,
       addSession: session => setSessions(current => [session, ...current]),
       artworks,

@@ -4,6 +4,7 @@ export type RouteParams = {
   Home: undefined;
   SpotDetails: {id: string};
   AddSpot: undefined;
+  EditSpot: {id: string};
   NewSession: undefined;
   LiveSession: {
     name: string;
