@@ -1,10 +1,7 @@
-import Geolocation from '@react-native-community/geolocation';
 import React, {useState} from 'react';
 import {
   Alert,
   Image,
-  PermissionsAndroid,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -12,7 +9,6 @@ import {
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {Button, Field, Header, Label, Screen} from '../../components/UI';
-import {colors} from '../../constants/theme';
 import {AppRoute} from '../../navigation/types';
 import {useApp} from '../../store/AppContext';
 
@@ -32,10 +28,6 @@ export function AddSpotScreen({
   const [photoUri, setPhotoUri] = useState<string | undefined>(
     existing?.photoUri,
   );
-  const [coordinates, setCoordinates] = useState<[number, number] | undefined>(
-    existing?.coordinates,
-  );
-  const [locating, setLocating] = useState(false);
 
   const addPhoto = async () => {
     const result = await launchImageLibrary({
@@ -50,50 +42,6 @@ export function AddSpotScreen({
       return;
     }
     setPhotoUri(result.assets?.[0]?.uri);
-  };
-
-  const addLocation = async () => {
-    if (Platform.OS === 'android') {
-      const permission = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      );
-      if (permission !== PermissionsAndroid.RESULTS.GRANTED) {
-        Alert.alert(
-          'Location permission required',
-          'Allow location access to mark your current fishing spot.',
-        );
-        return;
-      }
-    } else {
-      const granted = await new Promise<boolean>(resolve => {
-        Geolocation.requestAuthorization(
-          () => resolve(true),
-          () => resolve(false),
-        );
-      });
-      if (!granted) {
-        Alert.alert(
-          'Location permission required',
-          'Allow location access to mark your current fishing spot.',
-        );
-        return;
-      }
-    }
-    setLocating(true);
-    Geolocation.getCurrentPosition(
-      position => {
-        setCoordinates([
-          position.coords.latitude,
-          position.coords.longitude,
-        ]);
-        setLocating(false);
-      },
-      error => {
-        setLocating(false);
-        Alert.alert('Location unavailable', error.message);
-      },
-      {enableHighAccuracy: true, timeout: 15000, maximumAge: 10000},
-    );
   };
 
   const save = () => {
@@ -116,7 +64,7 @@ export function AddSpotScreen({
         .filter(Boolean),
       rules:
         existing?.rules ?? 'Check local regulations before fishing.',
-      coordinates: coordinates ?? [0, 0],
+      coordinates: existing?.coordinates ?? [0, 0],
       photoUri,
       saved: existing?.saved ?? true,
       custom: true,
@@ -143,16 +91,6 @@ export function AddSpotScreen({
       </View>
       <Label>Location Name *</Label>
       <Field value={name} onChangeText={setName} placeholder="Hidden Creek" />
-      <Label>Mark on Map</Label>
-      <Pressable style={styles.mapPlaceholder} onPress={addLocation}>
-        <Text style={styles.mapMarker}>
-          {locating
-            ? 'Finding location…'
-            : coordinates
-              ? `${coordinates[0].toFixed(5)}, ${coordinates[1].toFixed(5)}`
-              : '＋ Add current location'}
-        </Text>
-      </Pressable>
       <Label>Description</Label>
       <Field
         multiline
@@ -191,13 +129,5 @@ const styles = StyleSheet.create({
   },
   photoText: {color: '#8FA8B9'},
   photo: {width: '100%', height: '100%'},
-  mapPlaceholder: {
-    height: 150,
-    backgroundColor: '#103A57',
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mapMarker: {color: colors.text, fontWeight: '700'},
   save: {marginTop: 22},
 });

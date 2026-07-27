@@ -9,14 +9,6 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
   },
 }));
 
-jest.mock('@react-native-community/geolocation', () => ({
-  __esModule: true,
-  default: {
-    requestAuthorization: jest.fn(success => success()),
-    getCurrentPosition: jest.fn(),
-  },
-}));
-
 jest.mock('react-native-image-picker', () => ({
   launchImageLibrary: jest.fn(() => Promise.resolve({didCancel: true})),
 }));
