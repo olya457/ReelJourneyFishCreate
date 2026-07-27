@@ -1,7 +1,6 @@
 import React, {useRef, useState} from 'react';
-import {Alert, Pressable, StyleSheet, Text, View} from 'react-native';
+import {Pressable, StyleSheet, Text, View} from 'react-native';
 import MapView, {Callout, Marker, PROVIDER_DEFAULT} from 'react-native-maps';
-import {Field} from '../../components/UI';
 import {colors} from '../../constants/theme';
 import {useApp} from '../../store/AppContext';
 import {Spot} from '../../types';
@@ -10,7 +9,6 @@ export function MapScreen() {
   const {spots, navigate} = useApp();
   const mapRef = useRef<MapView>(null);
   const [selected, setSelected] = useState<Spot>();
-  const [query, setQuery] = useState('');
   const focus = (spot: Spot) => {
     setSelected(spot);
     mapRef.current?.animateToRegion(
@@ -22,22 +20,6 @@ export function MapScreen() {
       },
       500,
     );
-  };
-  const search = () => {
-    const normalized = query.trim().toLowerCase();
-    if (!normalized) {
-      return;
-    }
-    const result = spots.find(spot =>
-      `${spot.name} ${spot.region} ${spot.country}`
-        .toLowerCase()
-        .includes(normalized),
-    );
-    if (result) {
-      focus(result);
-    } else {
-      Alert.alert('Location not found', 'Try another lake, region, or country.');
-    }
   };
   return (
     <View style={styles.screen}>
@@ -76,19 +58,6 @@ export function MapScreen() {
             </Marker>
           ))}
       </MapView>
-      <View style={styles.search}>
-        <Field
-          placeholder="Search the fishing map"
-          value={query}
-          onChangeText={setQuery}
-          onSubmitEditing={search}
-          returnKeyType="search"
-          style={styles.field}
-        />
-        <Pressable style={styles.locate} onPress={search}>
-          <Text style={styles.locateText}>⌕</Text>
-        </Pressable>
-      </View>
       {selected && (
         <View style={styles.previewOverlay} pointerEvents="box-none">
           <View style={styles.preview}>
@@ -115,26 +84,6 @@ export function MapScreen() {
 }
 const styles = StyleSheet.create({
   screen: {flex: 1},
-  search: {
-    position: 'absolute',
-    top: 55,
-    left: 18,
-    right: 18,
-    flexDirection: 'row',
-    gap: 8,
-  },
-  field: {flex: 1},
-  locate: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  locateText: {fontSize: 25, color: colors.blue},
   previewOverlay: {
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
@@ -157,20 +106,20 @@ const styles = StyleSheet.create({
   },
   close: {
     position: 'absolute',
-    right: 12,
-    top: 10,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    right: 10,
+    top: 8,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.surface2,
     zIndex: 22,
     elevation: 22,
   },
-  closeText: {color: colors.text, fontSize: 22, lineHeight: 24},
+  closeText: {color: colors.text, fontSize: 24, lineHeight: 26},
   name: {fontSize: 20, color: colors.text, fontWeight: '800'},
-  about: {color: colors.muted, lineHeight: 18, marginTop: 5, marginRight: 20},
+  about: {color: colors.muted, lineHeight: 18, marginTop: 5, marginRight: 30},
   detailsButton: {
     marginTop: 16,
     minHeight: 48,
