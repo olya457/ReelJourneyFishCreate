@@ -10,6 +10,7 @@ export type Spot = {
   facilities: string[];
   rules: string;
   coordinates: [number, number];
+  photoUri?: string;
   saved?: boolean;
   custom?: boolean;
 };

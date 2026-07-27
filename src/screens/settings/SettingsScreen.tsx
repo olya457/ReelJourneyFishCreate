@@ -1,5 +1,15 @@
 import React, {useState} from 'react';
-import {Pressable, StyleSheet, Switch, Text, View} from 'react-native';
+import {
+  Alert,
+  Linking,
+  Platform,
+  Pressable,
+  Share,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from 'react-native';
 import {Chip, Header, Label, Screen} from '../../components/UI';
 import {colors} from '../../constants/theme';
 import {useApp} from '../../store/AppContext';
@@ -7,6 +17,23 @@ export function SettingsScreen() {
   const {back} = useApp();
   const [notifications, setNotifications] = useState(true);
   const [metric, setMetric] = useState(true);
+  const shareApp = async () => {
+    await Share.share({
+      message:
+        'Discover fishing locations with Wavora Journey: https://wavora.app',
+    });
+  };
+  const rateApp = async () => {
+    const url =
+      Platform.OS === 'ios'
+        ? 'https://apps.apple.com/us/search?term=Wavora%20Journey'
+        : 'market://details?id=com.reeljourneyfishcreate';
+    try {
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert('Store unavailable', 'Please try again later.');
+    }
+  };
   return (
     <Screen>
       <Header title="Settings" onBack={back} />
@@ -32,12 +59,14 @@ export function SettingsScreen() {
         />
       </View>
       <Label>About</Label>
-      {['Share App', 'Rate App'].map(x => (
-        <Pressable key={x} style={styles.link}>
-          <Text style={styles.title}>{x}</Text>
-          <Text style={styles.arrow}>›</Text>
-        </Pressable>
-      ))}
+      <Pressable style={styles.link} onPress={shareApp}>
+        <Text style={styles.title}>Share App</Text>
+        <Text style={styles.arrow}>›</Text>
+      </Pressable>
+      <Pressable style={styles.link} onPress={rateApp}>
+        <Text style={styles.title}>Rate App</Text>
+        <Text style={styles.arrow}>›</Text>
+      </Pressable>
     </Screen>
   );
 }

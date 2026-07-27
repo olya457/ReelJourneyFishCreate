@@ -25,7 +25,11 @@ export function SpotDetailsScreen({
   return (
     <Screen style={styles.screen}>
       <Image
-        source={spotImages[spot.id] || fallbackSpotImage}
+        source={
+          spot.photoUri
+            ? {uri: spot.photoUri}
+            : spotImages[spot.id] || fallbackSpotImage
+        }
         style={styles.hero}
       />
       <View style={styles.content}>
